@@ -127,10 +127,6 @@ class AioClient(Client):
     async def __aexit__(self, type, value, traceback):
         await self.shutdown()
 
-    def __del__(self):
-        if self.status == 'running':
-            self.loop.asyncio_loop.run_until_complete(self.shutdown(fast=True))
-
     async def start(self, timeout=5, **kwargs):
         if self.status == 'running':
             return
@@ -152,6 +148,8 @@ class AioClient(Client):
             future = self.cluster._close()
             await to_asyncio_future(future)
             self.cluster.status = 'closed'
+
+        BaseAsyncIOLoop.clear_current()
 
     gather = to_asyncio(Client._gather)
     scatter = to_asyncio(Client._scatter)
