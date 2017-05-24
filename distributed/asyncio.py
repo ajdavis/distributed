@@ -171,6 +171,9 @@ class AioClient(Client):
     def __enter__(self):
         raise RuntimeError("Use AioClient in an 'async with' block, not 'with'")
 
+    def __del__(self):
+        assert self.status != 'running'
+
 
 class AioAsCompleted(AsCompleted):
 
